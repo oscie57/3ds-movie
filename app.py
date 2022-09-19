@@ -19,6 +19,26 @@ def consolecheck(useragent):
     return console
 
 
+def validitycheck():
+    with open('list.json', 'r', encoding="utf-8") as f:
+        file = json.load(f)
+
+    for list in file['lists']:
+
+        if 'title' not in file['lists'][list]:
+            raise ValueError(f"Key 'title' not in '{list}'!")
+        if 'description' not in file['lists'][list]:
+            raise ValueError(f"Key 'description' not in '{list}'!")
+        if 'folder' not in file['lists'][list]:
+            raise ValueError(f"Key 'folder' not in '{list}'!")
+        if 'type' not in file['lists'][list]:
+            raise ValueError(f"Key 'type' not in '{list}'!")
+
+        folder = file['lists'][list]['folder']
+        if folder[3:][:-1] not in os.listdir(folder[:3]):
+            raise ValueError(f"Folder '{folder}' found in '{list}' doesn't exist. ")
+
+
 @app.route('/')
 def main():
     useragent = request.headers.get('User-Agent')
@@ -129,4 +149,5 @@ def css(sheet):
 
 
 if __name__ == '__main__':
+    validitycheck()
     app.run("192.168.0.34", 81, debug=True)
